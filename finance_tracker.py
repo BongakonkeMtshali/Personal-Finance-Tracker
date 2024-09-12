@@ -7,14 +7,14 @@ income = 0.0
 expenses = 0.0
 savings = 0.0
 
-# Functions
-
+# Step 1: Print Statement
 def print_welcome_message():
     """Prints a welcome message and instructions for the user."""
     print("Welcome to the Personal Finance Tracker!")
     print("You can add income, record expenses, and view your savings.")
     print("Select an option from the menu below to get started.")
 
+# Step 2: Data Input
 def safe_float_input(prompt):
     """Safely takes a float input from the user."""
     while True:
@@ -39,6 +39,7 @@ def input_transaction():
     category = input("Enter the category: ")
     return description, amount, category
 
+# Step 3: Financial Operations
 def add_income(amount):
     """Adds an income amount to the total."""
     global income
@@ -71,6 +72,7 @@ def display_report():
     for category, amount in categories.items():
         print(f"{category}: ${amount:.2f}")
 
+# Step 9: Data Visualization
 def plot_financial_data():
     """Plots a pie chart of expenses by category."""
     if categories:
@@ -82,6 +84,7 @@ def plot_financial_data():
     else:
         print("No expense data available to plot.")
 
+# Step 7: File Handling
 def save_data():
     """Saves transaction data to a JSON file."""
     with open('finance_data.json', 'w') as file:
@@ -104,10 +107,46 @@ def load_data():
             savings = data['savings']
             categories = data['categories']
     except FileNotFoundError:
-        pass
+        print("No previous data found. Starting fresh.")
 
+# Step 6: Menu Handlers
+def handle_add_income():
+    """Handles the add income operation."""
+    amount = safe_float_input("Enter income amount: ")
+    add_income(amount)
+    update_savings()
+
+def handle_add_expense():
+    """Handles the add expense operation."""
+    description, amount, category = input_transaction()
+    add_expense(amount, category)
+    update_savings()
+
+def handle_view_report():
+    """Handles viewing the financial report."""
+    display_report()
+
+def handle_plot_data():
+    """Handles plotting the expense data."""
+    plot_financial_data()
+
+def handle_exit():
+    """Handles exiting the application."""
+    print("Thank you for using the Personal Finance Tracker!")
+    save_data()
+    exit()
+
+# Step 11: Main Menu
 def main_menu():
     """Displays the main menu and processes user choices."""
+    menu_options = {
+        '1': handle_add_income,
+        '2': handle_add_expense,
+        '3': handle_view_report,
+        '4': handle_plot_data,
+        '5': handle_exit
+    }
+    
     while True:
         print("\n--- Main Menu ---")
         print("1. Add Income")
@@ -116,28 +155,11 @@ def main_menu():
         print("4. Plot Expense Data")
         print("5. Exit")
         
-        choice = safe_input("Choose an option: ", ['1', '2', '3', '4', '5'])
-        
-        if choice == '1':
-            amount = safe_float_input("Enter income amount: ")
-            add_income(amount)
-            update_savings()
-        elif choice == '2':
-            description, amount, category = input_transaction()
-            add_expense(amount, category)
-            update_savings()
-        elif choice == '3':
-            display_report()
-        elif choice == '4':
-            plot_financial_data()
-        elif choice == '5':
-            print("Thank you for using the Personal Finance Tracker!")
-            break
-        else:
-            print("Invalid choice. Please enter a number between 1 and 5.")
+        choice = safe_input("Choose an option: ", menu_options.keys())
+        menu_options[choice]()
 
+# Step 12: Conclusion
 if __name__ == "__main__":
     print_welcome_message()
     load_data()
     main_menu()
-    save_data()
